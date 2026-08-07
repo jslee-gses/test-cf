@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로또 6/45 행운의 번호 생성기 | Lotto Generator</title>
+  <meta name="description" content="실시간 3D 볼 추출 효과, 포함/제외 수 지정, 홀짝 및 총합 분석 기능을 제공하는 프리미엄 로또 6/45 번호 추천 앱입니다.">
+  <meta name="keywords" content="로또, 로또번호생성기, 645, 행운의번호, 로또추천, 로또분석, 로또자동">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="로또 6/45 행운의 번호 생성기">
+  <meta property="og:description" content="인공지능 필터링과 미학적인 추출 애니메이션으로 만나는 최첨단 로또 번호 생성기">
+  <meta property="og:site_name" content="Lotto 6/45 Generator">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Pretendard:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-background">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-ball">645</div>
+        <div class="logo-text">
+          <h1>LOTTO <span>6/45</span></h1>
+          <p>AI 행운 번호 생성기</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="soundToggle" class="icon-btn" title="사운드 켜기/끄기" aria-label="사운드 설정">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <button id="themeToggle" class="icon-btn" title="테마 변경" aria-label="테마 설정">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="main-layout">
+      <!-- Left Panel: Controls & Filters -->
+      <section class="control-panel card-glass">
+        <h2 class="panel-title"><i class="fa-solid fa-sliders"></i> 생성 옵션 설정</h2>
+
+        <div class="form-group">
+          <label for="gameCount"><i class="fa-solid fa-layer-group"></i> 게임 수 선택</label>
+          <div class="segmented-control">
+            <button class="seg-btn active" data-count="1">1 게임</button>
+            <button class="seg-btn" data-count="3">3 게임</button>
+            <button class="seg-btn" data-count="5">5 게임 (1세트)</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-filter"></i> 고급 필터 설정</label>
+          <div class="filter-actions">
+            <button id="openNumberPicker" class="btn btn-secondary btn-block">
+              <i class="fa-solid fa-check-double"></i> 포함/제외 수 지정 <span id="filterBadge" class="badge">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-toggle-box">
+          <div class="toggle-row">
+            <span><i class="fa-solid fa-scale-balanced"></i> 홀짝 균형 맞추기 (2:4 ~ 4:2)</span>
+            <label class="switch">
+              <input type="checkbox" id="oddEvenFilter" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <span><i class="fa-solid fa-calculator"></i> 총합 필터 (100 ~ 175)</span>
+            <label class="switch">
+              <input type="checkbox" id="sumFilter" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <button id="generateBtn" class="btn btn-primary btn-glow btn-block">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> 행운의 번호 추출하기
+        </button>
+      </section>
+
+      <!-- Right Panel: Extraction Stage & Results -->
+      <section class="stage-panel card-glass">
+        <!-- Interactive 3D Ball Machine -->
+        <div class="ball-machine" id="ballMachine">
+          <div class="machine-sphere">
+            <div class="inner-balls" id="innerBalls"></div>
+            <div class="glass-reflection"></div>
+          </div>
+          <div class="extraction-chute">
+            <div class="extracted-ball-spot" id="activeExtractBall"></div>
+          </div>
+        </div>
+
+        <!-- Result Displays -->
+        <div class="results-header">
+          <h2><i class="fa-solid fa-clover"></i> 생성된 행운 번호</h2>
+          <div class="result-actions" id="resultActions" style="display: none;">
+            <button id="copyAllBtn" class="btn btn-sm btn-outline"><i class="fa-regular fa-copy"></i> 전체 복사</button>
+            <button id="saveFavoriteBtn" class="btn btn-sm btn-outline"><i class="fa-regular fa-bookmark"></i> 즐겨찾기 저장</button>
+          </div>
+        </div>
+
+        <div id="resultsContainer" class="results-container">
+          <div class="empty-state">
+            <i class="fa-solid fa-circle-nodes empty-icon"></i>
+            <p>버튼을 눌러 행운의 번호를 추출해보세요!</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Section: Tabs (History / Favorites / Stats) -->
+    <section class="bottom-section card-glass">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="tabHistory"><i class="fa-solid fa-clock-rotate-left"></i> 최근 생성 히스토리</button>
+        <button class="tab-btn" data-tab="tabFavorites"><i class="fa-solid fa-star"></i> 저장한 보관함</button>
+        <button class="tab-btn" data-tab="tabStats"><i class="fa-solid fa-chart-pie"></i> 번호대별 통계</button>
+      </div>
+
+      <div class="tabs-content">
+        <!-- History Tab -->
+        <div id="tabHistory" class="tab-pane active">
+          <div id="historyList" class="history-list">
+            <p class="text-muted">최근 생성된 번호 내역이 여기에 표시됩니다.</p>
+          </div>
+        </div>
+
+        <!-- Favorites Tab -->
+        <div id="tabFavorites" class="tab-pane">
+          <div id="favoritesList" class="favorites-list">
+            <p class="text-muted">저장된 즐겨찾기 번호가 없습니다.</p>
+          </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="tabStats" class="tab-pane">
+          <div class="stats-grid">
+            <div class="stat-card color-yellow">
+              <span class="range">1 - 10</span>
+              <div class="stat-bar"><div class="bar-fill" id="bar1"></div></div>
+              <span class="count" id="count1">0회</span>
+            </div>
+            <div class="stat-card color-blue">
+              <span class="range">11 - 20</span>
+              <div class="stat-bar"><div class="bar-fill" id="bar2"></div></div>
+              <span class="count" id="count2">0회</span>
+            </div>
+            <div class="stat-card color-red">
+              <span class="range">21 - 30</span>
+              <div class="stat-bar"><div class="bar-fill" id="bar3"></div></div>
+              <span class="count" id="count3">0회</span>
+            </div>
+            <div class="stat-card color-purple">
+              <span class="range">31 - 40</span>
+              <div class="stat-bar"><div class="bar-fill" id="bar4"></div></div>
+              <span class="count" id="count4">0회</span>
+            </div>
+            <div class="stat-card color-green">
+              <span class="range">41 - 45</span>
+              <div class="stat-bar"><div class="bar-fill" id="bar5"></div></div>
+              <span class="count" id="count5">0회</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>© 2026 Lotto 6/45 Generator. Deployed on <i class="fa-solid fa-cloud"></i> <strong>Cloudflare Pages</strong>.</p>
+    </footer>
+  </div>
+
+  <!-- Number Picker Modal -->
+  <div id="pickerModal" class="modal-overlay">
+    <div class="modal-content card-glass">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullseye"></i> 포함 / 제외 번호 선택</h3>
+        <button id="closeModal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">원하는 번호를 클릭하여 <strong>고정 포함(녹색)</strong> 또는 <strong>제외(빨간색)</strong>로 설정하세요.</p>
+        
+        <div class="mode-selector">
+          <button class="mode-btn active" data-mode="include"><i class="fa-solid fa-plus-circle"></i> 포함할 번호 지정 (최대 5개)</button>
+          <button class="mode-btn" data-mode="exclude"><i class="fa-solid fa-minus-circle"></i> 제외할 번호 지정 (최대 15개)</button>
+        </div>
+
+        <div class="picker-grid" id="pickerGrid">
+          <!-- 1 ~ 45 balls injected by JS -->
+        </div>
+
+        <div class="selected-summary">
+          <div class="sum-group">
+            <span class="tag-label text-success">포함:</span>
+            <div id="includeTags" class="tag-container"><span class="none">없음</span></div>
+          </div>
+          <div class="sum-group">
+            <span class="tag-label text-danger">제외:</span>
+            <div id="excludeTags" class="tag-container"><span class="none">없음</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="resetPickerBtn" class="btn btn-outline">초기화</button>
+        <button id="savePickerBtn" class="btn btn-primary">적용하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
